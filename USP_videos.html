@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Live Sansad | USP Videos Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF6B00;
+            --primary-dark: #CC5500;
+            --secondary: #138808;
+            --secondary-light: #1FAD0A;
+            --accent: #003580;
+            --light: #f8f9fa;
+            --dark: #1A1208;
+            --gray: #7A6858;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --gradient-subtle: linear-gradient(135deg, rgba(255,107,0,0.08), rgba(19,136,8,0.08));
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+            --shadow-hover: 0 8px 30px rgba(0,0,0,0.12);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: 0.22s ease;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f0f2f7;
+            color: var(--dark);
+            line-height: 1.5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Navbar */
+        .navbar {
+            background: linear-gradient(135deg, #04152d 0%, #0a1a35 100%);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,107,0,0.25);
+        }
+        .navbar-container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .navbar-brand i {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+        .navbar-brand span {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: white;
+            letter-spacing: -0.3px;
+        }
+        .navbar-brand small {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.6);
+            font-weight: normal;
+            margin-left: 5px;
+        }
+        .navbar-menu {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .nav-links {
+            display: flex;
+            gap: 24px;
+            margin-right: 20px;
+        }
+        .nav-links a {
+            color: rgba(255,255,255,0.75);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color var(--transition);
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary);
+        }
+        .welcome-text {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+        }
+        .welcome-text i {
+            margin-right: 6px;
+            color: var(--primary);
+        }
+        .logout-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px 18px;
+            border-radius: 40px;
+            color: white;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .logout-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* Main Container - Split View */
+        .split-container {
+            display: flex;
+            height: calc(100vh - 70px);
+            overflow: hidden;
+        }
+
+        /* Left Sidebar - Video List */
+        .video-list-sidebar {
+            width: 380px;
+            background: #fff;
+            border-right: 1px solid rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 2px 0 12px rgba(0,0,0,0.05);
+        }
+        .sidebar-header {
+            background: var(--gradient);
+            padding: 20px;
+            color: white;
+        }
+        .sidebar-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .sidebar-header p {
+            margin: 8px 0 0;
+            font-size: 0.75rem;
+            opacity: 0.85;
+        }
+        .search-box {
+            padding: 16px;
+            border-bottom: 1px solid #f0ece6;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px 16px;
+            border: 2px solid #e8ecef;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            transition: all var(--transition);
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(255,107,0,0.1);
+        }
+        .videos-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+        }
+        .video-list-item {
+            background: #fff;
+            border: 1px solid #f0ece6;
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .video-list-item:hover {
+            transform: translateX(4px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+        }
+        .video-list-item.active {
+            background: var(--gradient-subtle);
+            border-left: 3px solid var(--primary);
+            border-color: var(--primary);
+        }
+        .video-list-title {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--dark);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .video-list-title i {
+            color: var(--primary);
+        }
+        .video-list-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 0.7rem;
+            color: var(--gray);
+        }
+        .video-list-meta span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 600;
+        }
+        .status-published {
+            background: #e8f5e9;
+            color: var(--secondary);
+        }
+        .status-draft {
+            background: #fff3e0;
+            color: #f5a623;
+        }
+        .empty-list {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        /* Right Panel - Video Details */
+        .video-details-panel {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px 32px;
+            background: #f8f9fc;
+        }
+        .detail-section {
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        .section-header {
+            background: var(--gradient);
+            padding: 16px 20px;
+            color: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .section-header i {
+            font-size: 1.1rem;
+        }
+        .section-body {
+            padding: 20px;
+        }
+        .video-player-container {
+            background: #000;
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            text-align: center;
+        }
+        .video-player-container video {
+            width: 100%;
+            max-height: 400px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .stat-card {
+            background: var(--gradient-subtle);
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            text-align: center;
+        }
+        .stat-card i {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        .stat-card .stat-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--dark);
+        }
+        .stat-card .stat-label {
+            font-size: 0.7rem;
+            color: var(--gray);
+            text-transform: uppercase;
+        }
+        .info-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px dashed #f0ece6;
+        }
+        .info-label {
+            width: 140px;
+            font-weight: 600;
+            color: var(--gray);
+        }
+        .info-value {
+            flex: 1;
+            color: var(--dark);
+        }
+        .topics-list {
+            list-style: none;
+            padding: 0;
+        }
+        .topic-item {
+            margin-bottom: 20px;
+            border-left: 3px solid var(--primary);
+            padding-left: 15px;
+        }
+        .topic-title {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        .highlight-points {
+            list-style: none;
+            padding-left: 20px;
+        }
+        .highlight-points li {
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            position: relative;
+        }
+        .highlight-points li:before {
+            content: "•";
+            color: var(--primary);
+            font-weight: bold;
+            position: absolute;
+            left: -15px;
+        }
+        .summary-text {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .speech-text {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: var(--radius-sm);
+            font-family: monospace;
+            font-size: 0.8rem;
+            white-space: pre-wrap;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 900px) {
+            .video-list-sidebar {
+                width: 300px;
+            }
+            .info-label {
+                width: 110px;
+            }
+        }
+        @media (max-width: 768px) {
+            .split-container {
+                flex-direction: column;
+            }
+            .video-list-sidebar {
+                width: 100%;
+                height: 350px;
+            }
+            body {
+                overflow-y: auto;
+                height: auto;
+            }
+            .split-container {
+                height: auto;
+            }
+            .video-details-panel {
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="#" class="navbar-brand">
+                <i class="fas fa-landmark"></i>
+                <span>Live Sansad <small>Admin Portal</small></span>
+            </a>
+            <div class="navbar-menu">
+                <div class="nav-links">
+                    <a href="#">Dashboard</a>
+                    <a href="#">Citizens</a>
+                    <a href="#">MPs</a>
+                    <a href="#" class="active">USP Videos</a>
+                </div>
+                <span class="welcome-text"><i class="fas fa-user-shield"></i> Welcome, Admin</span>
+                <a href="#" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Split Container -->
+    <div class="split-container">
+        <!-- Left Sidebar - Video List -->
+        <div class="video-list-sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-video"></i> USP Videos Library</h3>
+                <p>Select a video to view complete details</p>
+            </div>
+            <div class="search-box">
+                <input type="text" id="searchVideo" placeholder="🔍 Search by title or UID...">
+            </div>
+            <div class="videos-list" id="videosList">
+                {% for video in usp_videos %}
+                <div class="video-list-item" data-video-id="{{ video.id }}" data-video-uid="{{ video.video_uid }}">
+                    <div class="video-list-title">
+                        <i class="fas fa-play-circle"></i>
+                        {{ video.title|truncatechars:50 }}
+                    </div>
+                    <div class="video-list-meta">
+                        <span><i class="fas fa-hashtag"></i> {{ video.video_uid|truncatechars:12 }}</span>
+                        <span><i class="fas fa-eye"></i> {{ video.total_views|default:0 }}</span>
+                        <span><i class="fas fa-thumbs-up"></i> {{ video.total_likes|default:0 }}</span>
+                        <span class="status-badge {% if video.status == 'published' %}status-published{% else %}status-draft{% endif %}">
+                            {{ video.status|default:"draft" }}
+                        </span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-list">
+                    <i class="fas fa-video-slash fa-2x mb-2"></i>
+                    <p>No USP Videos Found</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Right Panel - Video Details -->
+        <div class="video-details-panel" id="videoDetailsPanel">
+            {% for video in usp_videos %}
+            <div class="video-detail-content" id="videoDetail-{{ video.id }}" style="display: {% if forloop.first %}block{% else %}none{% endif %};">
+                <!-- Video Player Section -->
+                <div class="detail-section">
+                    <div class="section-header">
+                        <i class="fas fa-play-circle"></i>
+                        <span>Video Player</span>
+                    </div>
+                    <div class="section-body">
+                        {% if video.video_file %}
+                        <div class="video-player-container">
+                            <video controls>
+                                <source src="{{ video.video_file.url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+                        {% else %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="fas fa-video-slash fa-3x mb-2"></i>
+                            <p>Video file not available</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Statistics Section -->
+                <div class="detail-section">
+                    <div class="section-header">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Engagement Statistics</span>
+                    </div>
+                    <div class="section-body">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <i class="fas fa-eye"></i>
+                                <div class="stat-value">{{ video.total_views|default:0 }}</div>
+                                <div class="stat-label">Views</div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-thumbs-up"></i>
+                                <div class="stat-value">{{ video.total_likes|default:0 }}</div>
+                                <div class="stat-label">Likes</div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-thumbs-down"></i>
+                                <div class="stat-value">{{ video.total_dislikes|default:0 }}</div>
+                                <div class="stat-label">Dislikes</div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-comment"></i>
+                                <div class="stat-value">{{ video.total_comments|default:0 }}</div>
+                                <div class="stat-label">Comments</div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-flag"></i>
+                                <div class="stat-value">{{ video.total_complaints|default:0 }}</div>
+                                <div class="stat-label">Complaints</div>
+                            </div>
+                            <div class="stat-card">
+                                <i class="fas fa-star"></i>
+                                <div class="stat-value">{{ video.total_feedbacks|default:0 }}</div>
+                                <div class="stat-label">Feedbacks</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Basic Information -->
+                <div class="detail-section">
+                    <div class="section-header">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Video Information</span>
+                    </div>
+                    <div class="section-body">
+                        <div class="info-row">
+                            <div class="info-label"><i class="fas fa-heading"></i> Title</div>
+                            <div class="info-value">{{ video.title }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label"><i class="fas fa-hashtag"></i> USP UID</div>
+                            <div class="info-value"><code>{{ video.video_uid }}</code></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label"><i class="fas fa-database"></i> Original Video ID</div>
+                            <div class="info-value">{{ video.original_video_id|default:"—" }}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label"><i class="fas fa-tag"></i> Status</div>
+                            <div class="info-value">
+                                <span class="status-badge {% if video.status == 'published' %}status-published{% else %}status-draft{% endif %}">
+                                    {{ video.status|default:"draft" }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label"><i class="fas fa-calendar"></i> Created</div>
+                            <div class="info-value">{{ video.created_at|default:"—" }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- One Line Summary -->
+                {% if video.highlights.one_line_summary %}
+                <div class="detail-section">
+                    <div class="section-header">
+                        <i class="fas fa-quote-left"></i>
+                        <span>One Line Summary</span>
+                    </div>
+                    <div class="section-body">
+                        <p class="mb-0" style="font-style: italic; color: var(--gray);">
+                            "{{ video.highlights.one_line_summary }}"
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Topics & Highlights -->
+                {% if video.highlights.topics %}
+                <div class="detail-section">
+                    <div class="section-header">
+                        <i class="fas fa-list-ul"></i>
+                        <span>Topics & Highlights</span>
+                    </div>
+                    <div class="section-body">
+                        <div class="topics-list">
+                            {% for topic in video.highlights.topics %}
+                            <div class="topic-item">
+                                <div class="topic-title">{{ topic.title }}</div>
+                                <ul class="highlight-points">
+                                    {% for point in topic.highlights %}
+                                    <li>{{ point }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Full Summary -->
+                {% if video.summary %}
+                <div class="detail-section">
+                    <div class="section-header">
+                        <i class="fas fa-file-alt"></i>
+                        <span>Full Summary</span>
+                    </div>
+                    <div class="section-body">
+                        <div class="summary-text">{{ video.summary }}</div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- MP Speeches -->
+                {% if video.mp_speeches %}
+                <div class="detail-section">
+                    <div class="section-header">
+                        <i class="fas fa-microphone-alt"></i>
+                        <span>MP Speeches / Transcript</span>
+                    </div>
+                    <div class="section-body">
+                        <div class="speech-text">{{ video.mp_speeches }}</div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            {% empty %}
+            <div class="text-center py-5">
+                <i class="fas fa-video-slash fa-4x mb-3" style="color: var(--gray);"></i>
+                <h4>No USP Videos Found</h4>
+                <p class="text-muted">Import YouTube videos and generate USP content to see them here.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        // Video selection functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const videoItems = document.querySelectorAll('.video-list-item');
+            const detailContents = document.querySelectorAll('.video-detail-content');
+            
+            // Function to show selected video detail
+            function showVideoDetail(videoId) {
+                // Hide all detail contents
+                detailContents.forEach(content => {
+                    content.style.display = 'none';
+                });
+                
+                // Show selected detail content
+                const selectedDetail = document.getElementById(`videoDetail-${videoId}`);
+                if (selectedDetail) {
+                    selectedDetail.style.display = 'block';
+                }
+                
+                // Update active state in list
+                videoItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.getAttribute('data-video-id') == videoId) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+            
+            // Add click event to each video item
+            videoItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const videoId = this.getAttribute('data-video-id');
+                    showVideoDetail(videoId);
+                });
+            });
+            
+            // Search functionality
+            const searchInput = document.getElementById('searchVideo');
+            if (searchInput) {
+                searchInput.addEventListener('keyup', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    videoItems.forEach(item => {
+                        const title = item.querySelector('.video-list-title')?.innerText.toLowerCase() || '';
+                        const uid = item.getAttribute('data-video-uid')?.toLowerCase() || '';
+                        if (title.includes(searchTerm) || uid.includes(searchTerm)) {
+                            item.style.display = '';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            }
+            
+            // Auto-select first video on load
+            if (videoItems.length > 0) {
+                const firstVideoId = videoItems[0].getAttribute('data-video-id');
+                showVideoDetail(firstVideoId);
+            }
+        });
+    </script>
+</body>
+</html>
