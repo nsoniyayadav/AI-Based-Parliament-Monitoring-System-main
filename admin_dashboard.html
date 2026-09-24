@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Live Sansad | Admin Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        :root {
+            --primary: #FF6B00;
+            --primary-dark: #CC5500;
+            --secondary: #138808;
+            --secondary-light: #1FAD0A;
+            --accent: #003580;
+            --light: #f8f9fa;
+            --dark: #1A1208;
+            --gray: #7A6858;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+            --gradient-subtle: linear-gradient(135deg, rgba(255,107,0,0.08), rgba(19,136,8,0.08));
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --shadow-hover: 0 6px 20px rgba(0,0,0,0.13);
+            --radius: 14px;
+            --radius-sm: 8px;
+            --transition: 0.22s ease;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f0f2f7;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        /* ── Navbar ── */
+        .navbar {
+            background: linear-gradient(135deg, #04152d 0%, #0a1a35 100%);
+            box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+            padding: 14px 0;
+            border-bottom: 1px solid rgba(255,107,0,0.2);
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.45rem;
+            color: #fff !important;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+        }
+        .navbar-brand i { color: var(--primary); margin-right: 10px; }
+        .navbar-text { color: rgba(255,255,255,0.6) !important; font-size: 0.9rem; }
+        .navbar-toggler { border-color: rgba(255,255,255,0.2); }
+        .navbar-toggler-icon { filter: invert(1); }
+
+        /* ── Cards ── */
+        .card {
+            border: none;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: transform var(--transition), box-shadow var(--transition);
+            overflow: hidden;
+            margin-bottom: 20px;
+            background: #fff;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+        .card-header {
+            background: var(--gradient);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 13px 18px;
+            border-bottom: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            letter-spacing: 0.1px;
+            border-radius: var(--radius) var(--radius) 0 0 !important;
+        }
+        .card-header i { font-size: 1.05rem; opacity: 0.9; }
+        .card-body { padding: 20px; }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 22px 16px;
+            height: calc(100vh - 120px);
+            position: sticky;
+            top: 20px;
+            overflow-y: auto;
+            border: 1px solid rgba(0,0,0,0.04);
+            transition: transform 0.28s ease;
+        }
+        .sidebar .nav-link {
+            color: #4a4036;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 3px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: background var(--transition), color var(--transition), transform var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+        .sidebar .nav-link i { width: 18px; text-align: center; font-size: 0.95rem; opacity: 0.75; flex-shrink: 0; }
+        .sidebar .nav-link:hover {
+            background: var(--gradient-subtle);
+            color: var(--primary);
+            transform: translateX(3px);
+        }
+        .sidebar .nav-link.active {
+            background: var(--gradient);
+            color: #fff;
+            transform: translateX(3px);
+            box-shadow: 0 3px 10px rgba(255,107,0,0.25);
+        }
+        .sidebar .nav-link.active i { opacity: 1; }
+        .sidebar::-webkit-scrollbar { width: 5px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,107,0,0.3); border-radius: 10px; }
+        .sidebar::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* ── Profile info box ── */
+        .profile-info {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .profile-info h5 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .compact-profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .profile-img-container { position: relative; margin-bottom: 10px; }
+        .profile-img-large {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            object-fit: cover;
+            box-shadow: 0 0 0 3px rgba(255,107,0,0.25), 0 4px 12px rgba(0,0,0,0.1);
+            transition: box-shadow var(--transition), transform var(--transition);
+        }
+        .profile-img-large:hover {
+            transform: scale(1.04);
+            box-shadow: 0 0 0 4px rgba(255,107,0,0.45), 0 6px 16px rgba(0,0,0,0.15);
+        }
+        .three-dot-btn-profile {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition);
+            cursor: pointer;
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+        .three-dot-btn-profile:hover { background: var(--primary); color: #fff; border-color: var(--primary); }
+        .profile-text-minimal h6 { font-weight: 700; font-size: 0.95rem; margin-bottom: 2px; color: var(--dark); }
+        .profile-text-minimal p { font-size: 0.8rem; color: var(--gray); margin: 0; }
+        .profile-details { border-top: 1px solid #f0ede8; padding-top: 12px; }
+        .profile-info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 0;
+            border-bottom: 1px dashed #f0ede8;
+            font-size: 0.83rem;
+        }
+        .profile-info-item:last-child { border-bottom: none; }
+        .profile-info-label { color: var(--gray); font-weight: 500; }
+        .profile-info-value { font-weight: 600; color: var(--dark); font-size: 0.82rem; word-break: break-all; text-align: right; max-width: 60%; }
+
+        /* ── Sidebar section headings ── */
+        .sidebar-section { margin-bottom: 18px; }
+        .sidebar-section h6 {
+            font-weight: 700;
+            font-size: 0.72rem;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            padding-left: 4px;
+        }
+
+        /* ── Dashboard stat cards ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+        .dashboard-card {
+            text-align: center;
+            padding: 22px 14px 18px;
+            position: relative;
+            overflow: hidden;
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: transform var(--transition), box-shadow var(--transition);
+            margin-bottom: 0;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-hover);
+        }
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--gradient);
+        }
+        .dashboard-card::after {
+            content: '';
+            position: absolute;
+            bottom: -30px; right: -30px;
+            width: 90px; height: 90px;
+            border-radius: 50%;
+            background: var(--gradient-subtle);
+            pointer-events: none;
+        }
+        .dashboard-card .stat-icon {
+            font-size: 1.7rem;
+            color: var(--primary);
+            display: block;
+            margin-bottom: 8px;
+        }
+        .dashboard-card .stat-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .dashboard-card .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        /* ── Tables ── */
+        .table { font-size: 0.875rem; margin-bottom: 0; }
+        .table thead th {
+            background: rgba(255,107,0,0.06);
+            color: var(--dark);
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            padding: 10px 12px;
+        }
+        .table tbody tr { transition: background var(--transition); }
+        .table tbody tr:hover { background: rgba(255,107,0,0.04); }
+        .table tbody td { padding: 10px 12px; border-color: #f5f2ee; vertical-align: middle; color: #3a3028; }
+        .table-bordered { border: 1px solid #f0ece6 !important; }
+        .table-bordered th, .table-bordered td { border-color: #f0ece6 !important; }
+        .table-responsive { border-radius: var(--radius-sm); overflow: hidden; }
+
+        /* ── Activity list items ── */
+        .list-group-item {
+            background: var(--gradient-subtle);
+            border-left: 3px solid var(--primary) !important;
+            border-top: none !important;
+            border-right: none !important;
+            border-bottom: none !important;
+            border-radius: var(--radius-sm) !important;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--dark);
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            box-shadow: none;
+            transition: none;
+        }
+        .list-group-item:hover { transform: none; box-shadow: none; }
+
+        /* ── Buttons ── */
+        .btn-primary {
+            background: var(--gradient);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 0.88rem;
+            padding: 9px 20px;
+            letter-spacing: 0.2px;
+            transition: all var(--transition);
+            box-shadow: 0 3px 10px rgba(255,107,0,0.2);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            transform: translateY(-1px);
+            box-shadow: 0 5px 14px rgba(255,107,0,0.3);
+        }
+        .btn-success { background: var(--secondary); border: none; color: white; border-radius: var(--radius-sm); }
+        .btn-success:hover { background: var(--secondary-light); }
+        .btn-warning { background: #f5a623; border: none; color: white; border-radius: var(--radius-sm); }
+        .btn-outline-light { border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 500; }
+
+        /* ── Dropdown ── */
+        .dropdown-menu {
+            border: 1px solid rgba(0,0,0,0.07);
+            border-radius: var(--radius-sm);
+            box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+            padding: 8px;
+        }
+        .dropdown-item {
+            border-radius: 6px;
+            font-size: 0.88rem;
+            padding: 8px 12px;
+            transition: background var(--transition), color var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dropdown-item:hover { background: rgba(255,107,0,0.08); color: var(--primary); }
+        .dropdown-item i { width: 16px; text-align: center; }
+
+        /* ── Three-dot menu ── */
+        .three-dot-menu { position: relative; display: inline-block; }
+        .three-dot-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            width: 34px; height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background var(--transition);
+        }
+        .three-dot-btn:hover { background: rgba(255,107,0,0.1); }
+        .three-dot-btn i { color: var(--primary); font-size: 1.1rem; }
+
+        /* ── Mobile toggle ── */
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            bottom: 20px; right: 20px;
+            z-index: 1050;
+            width: 56px; height: 56px;
+            border-radius: 50%;
+            background: var(--gradient);
+            color: #fff;
+            border: none;
+            box-shadow: 0 4px 16px rgba(255,107,0,0.4);
+            font-size: 1.4rem;
+            align-items: center;
+            justify-content: center;
+            transition: transform var(--transition), box-shadow var(--transition);
+        }
+        .sidebar-toggle:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(255,107,0,0.5); }
+
+        /* ── Sidebar overlay ── */
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(4,21,45,0.55);
+            z-index: 1040;
+            display: none;
+            backdrop-filter: blur(2px);
+        }
+
+        /* ── Dashboard scrollable content ── */
+        .dashboard-content { height: calc(100vh - 120px); overflow-y: auto; padding-right: 8px; }
+        .dashboard-content::-webkit-scrollbar { width: 5px; }
+        .dashboard-content::-webkit-scrollbar-track { background: transparent; }
+        .dashboard-content::-webkit-scrollbar-thumb { background: rgba(255,107,0,0.3); border-radius: 10px; }
+        .dashboard-content::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* ── Footer ── */
+        footer {
+            background: linear-gradient(135deg, #04152d 0%, #0a1a35 100%);
+            color: rgba(255,255,255,0.65);
+            padding: 18px 0;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255,107,0,0.2);
+            font-size: 0.85rem;
+        }
+
+        /* ── HR ── */
+        hr { border-color: #f0ede8; margin: 14px 0; opacity: 1; }
+
+        /* ── Section heading ── */
+        .section-heading {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 18px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid transparent;
+            border-image: var(--gradient) 1;
+            display: inline-block;
+        }
+
+        /* ── Badge ── */
+        .badge { transition: transform var(--transition); }
+        .badge:hover { transform: scale(1.05); }
+        .bg-success { background: var(--secondary) !important; }
+
+        /* ── Progress ── */
+        .progress { height: 8px; border-radius: 4px; }
+        .progress-bar { background: var(--gradient); }
+
+        /* ── Activity item ── */
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 14px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            background: var(--gradient-subtle);
+            transition: transform var(--transition);
+            border-left: 3px solid rgba(255,107,0,0.3);
+        }
+        .activity-item:hover { transform: translateX(3px); }
+        .activity-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--gradient);
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        /* ── Recent activity list ── */
+        .recent-list li {
+            padding: 5px 0;
+            font-size: 0.83rem;
+            color: #5a4e42;
+            border-bottom: 1px dashed #f0ede8;
+        }
+        .recent-list li:last-child { border-bottom: none; }
+
+        /* ── Responsive ── */
+        @media (max-width: 992px) {
+            .sidebar {
+                position: fixed;
+                top: 0; left: 0;
+                width: 275px;
+                height: 100vh;
+                z-index: 1050;
+                transform: translateX(-100%);
+                border-radius: 0;
+                box-shadow: 5px 0 20px rgba(0,0,0,0.15);
+            }
+            .sidebar.active { transform: translateX(0); }
+            .sidebar-toggle { display: flex; }
+            .dashboard-content { height: auto; overflow: visible; padding-right: 0; }
+            .col-lg-3 { padding: 0; }
+            .col-lg-9 { flex: 0 0 100%; max-width: 100%; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 576px) {
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── Navigation ── -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-landmark"></i> Live Sansad
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link text-white-50" href="#">View Site</a>
+                    </li>
+                </ul>
+                <div class="d-flex align-items-center gap-3">
+                    <span class="navbar-text">Welcome, Prof. Sharma</span>
+                    <a href="#" class="btn btn-outline-light btn-sm">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ── Main Content ── -->
+    <div class="container mt-4">
+        <div class="row g-3">
+
+            <!-- ── Sidebar ── -->
+            <div class="col-lg-3">
+                <div class="sidebar" id="sidebar">
+
+                    <!-- Profile Section -->
+                    <div class="profile-info">
+                        <div class="compact-profile">
+                            <div class="profile-img-container">
+                                <img
+                                    src="{{ admin_profile.admin_profile_img_url|default:'' }}"
+                                    onerror="this.onerror=null;this.src='https://randomuser.me/api/portraits/men/32.jpg';"
+                                    class="profile-img-large" alt="Profile">
+                                <button class="three-dot-btn-profile" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#"><i class="fas fa-user-edit"></i> Edit Profile</a></li>
+                                </ul>
+                            </div>
+                            <div class="profile-text-minimal mt-2">
+                                <h6>{{ admin_profile.admin_name|default:'Admin' }}</h6>
+                                <p>{{ admin_profile.admin_username|default:'' }}</p>
+                            </div>
+                        </div>
+
+                        <div class="profile-details">
+                            <div class="profile-info-item">
+                                <span class="profile-info-label">Admin ID</span>
+                                <span class="profile-info-value">{{ admin_profile.admin_admin_id|default:'—' }}</span>
+                            </div>
+                            <div class="profile-info-item">
+                                <span class="profile-info-label">Email</span>
+                                <span class="profile-info-value">{{ admin_profile.admin_email|default:'—' }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Sidebar Navigation -->
+                    <div class="sidebar-section">
+                        <h6>My Dashboard</h6>
+                        <ul class="nav flex-column" id="sidebar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#overview-panel">
+                                    <i class="fas fa-tachometer-alt"></i> Dashboard Overview
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/citizens/">
+                                    <i class="fas fa-users"></i> Citizens
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="/mps/">
+                                    <i class="fas fa-id-card"></i> MPs
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/mp-admin-ids/">
+                                    <i class="fas fa-id-badge"></i> MP Admin IDs
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/mp-face-detections/">
+                                    <i class="fas fa-camera"></i> MP Face Detection
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/offline-video-uploads/">
+                                    <i class="fas fa-upload"></i> Offline Video Uploads
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/youtube-videos/">
+                                    <i class="fab fa-youtube"></i> YouTube Videos
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/usp-videos/">
+                                    <i class="fas fa-brain"></i> USP Videos
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'session_player' %}">
+                                    <i class="fas fa-play-circle"></i>Session Player
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/comments/">
+                                    <i class="fas fa-comment-dots"></i> Comments
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/votes/">
+                                    <i class="fas fa-thumbs-up"></i> Votes
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/complaints/">
+                                    <i class="fas fa-flag"></i> Complaints
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="/feedback/">
+                                    <i class="fas fa-star"></i> Feedback
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <hr>
+
+                </div>
+            </div>
+            <!-- /Sidebar -->
+
+            <!-- ── Right Panel ── -->
+            <div class="col-lg-9">
+                <div class="dashboard-content" id="overview-panel">
+
+                    <h4 class="section-heading mb-4">Dashboard Overview</h4>
+
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+
+                        <div class="dashboard-card">
+                            <i class="fas fa-users stat-icon"></i>
+                            <span class="stat-label">Total Citizens</span>
+                            <p class="stat-value">{{ totals.citizen }}</p>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <i class="fas fa-id-card stat-icon"></i>
+                            <span class="stat-label">Total MPs</span>
+                            <p class="stat-value">{{ totals.mp }}</p>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <i class="fas fa-user-shield stat-icon"></i>
+                            <span class="stat-label">Total MP Admin IDs</span>
+                            <p class="stat-value">{{ totals.mp_admin_id }}</p>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <i class="fas fa-camera stat-icon"></i>
+                            <span class="stat-label">MP Face Detection</span>
+                            <p class="stat-value">{{ totals.mp_face_detection }}</p>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <i class="fas fa-upload stat-icon"></i>
+                            <span class="stat-label">Offline Videos</span>
+                            <p class="stat-value">{{ totals.offline_video_upload }}</p>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <i class="fab fa-youtube stat-icon"></i>
+                            <span class="stat-label">YouTube Videos</span>
+                            <p class="stat-value">{{ totals.youtube_video }}</p>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <i class="fas fa-brain stat-icon"></i>
+                            <span class="stat-label">USP Videos</span>
+                            <p class="stat-value">{{ totals.usp_video }}</p>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <i class="fas fa-comment stat-icon"></i>
+                            <span class="stat-label">Total Comments</span>
+                            <p class="stat-value">{{ totals.usp_comment }}</p>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <i class="fas fa-thumbs-up stat-icon"></i>
+                            <span class="stat-label">Total Votes</span>
+                            <p class="stat-value">{{ totals.usp_vote }}</p>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <i class="fas fa-flag stat-icon"></i>
+                            <span class="stat-label">Total Complaints</span>
+                            <p class="stat-value">{{ totals.usp_complaint }}</p>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <i class="fas fa-star stat-icon"></i>
+                            <span class="stat-label">Total Feedback</span>
+                            <p class="stat-value">{{ totals.usp_feedback }}</p>
+                        </div>
+
+                    </div>
+                    <!-- /Stats Grid -->
+
+                    <!-- Recent Records -->
+                    <div class="row g-3">
+
+                        <!-- Latest Citizens -->
+                        <div class="col-12 mb-2">
+                            <div class="profile-info">
+                                <h5><i class="fas fa-users me-2" style="color:var(--primary);"></i>Latest Citizens</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Username</th>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for c in recent.latest_citizens %}
+                                            <tr>
+                                                <td>{{ c.id }}</td>
+                                                <td><strong>{{ c.username }}</strong></td>
+                                                <td>{{ c.name }}</td>
+                                                <td>{{ c.email }}</td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr><td colspan="4" class="text-muted text-center py-3">No citizens found</td></tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Latest MPs -->
+                        <div class="col-12 mb-2">
+                            <div class="profile-info">
+                                <h5><i class="fas fa-id-card me-2" style="color:var(--primary);"></i>Latest MPs</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Username</th>
+                                                <th>Name</th>
+                                                <th>Email</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for m in recent.latest_mps %}
+                                            <tr>
+                                                <td>{{ m.id }}</td>
+                                                <td><strong>{{ m.username }}</strong></td>
+                                                <td>{{ m.name }}</td>
+                                                <td>{{ m.email }}</td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr><td colspan="4" class="text-muted text-center py-3">No MPs found</td></tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Latest YouTube Videos -->
+                        <div class="col-12 mb-2">
+                            <div class="profile-info">
+                                <h5><i class="fab fa-youtube me-2" style="color:var(--primary);"></i>Latest YouTube Videos</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Video ID</th>
+                                                <th>Title</th>
+                                                <th>Channel</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for y in recent.latest_youtube_videos %}
+                                            <tr>
+                                                <td>{{ y.id }}</td>
+                                                <td><code>{{ y.video_id }}</code></td>
+                                                <td>{{ y.title }}</td>
+                                                <td>{{ y.channel_name }}</td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr><td colspan="4" class="text-muted text-center py-3">No YouTube videos found</td></tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Latest USP Videos -->
+                        <div class="col-12 mb-2">
+                            <div class="profile-info">
+                                <h5><i class="fas fa-brain me-2" style="color:var(--primary);"></i>Latest USP Videos</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-sm table-bordered mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Video UID</th>
+                                                <th>Title</th>
+                                                <th>Status</th>
+                                                <th>Created At</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for u in recent.latest_usp_videos %}
+                                            <tr>
+                                                <td><code>{{ u.video_uid }}</code></td>
+                                                <td>{{ u.title }}</td>
+                                                <td>
+                                                    <span class="badge bg-success">{{ u.status }}</span>
+                                                </td>
+                                                <td>{{ u.created_at }}</td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr><td colspan="4" class="text-muted text-center py-3">No USP videos found</td></tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <!-- /Recent Records -->
+
+                    <!-- Recent Activity Summary -->
+                    <div class="profile-info mt-2">
+                        <h5><i class="fas fa-bolt me-2" style="color:var(--primary);"></i>Recent Activity Summary</h5>
+                        <div class="row g-3">
+
+                            <div class="col-md-4">
+                                <div class="list-group-item mb-2">
+                                    <i class="fas fa-comment me-2"></i> Latest Comments
+                                    <span class="badge bg-success float-end">{{ recent.latest_comments|length }}</span>
+                                </div>
+                                <ul class="list-unstyled recent-list ps-1">
+                                    {% for c in recent.latest_comments %}
+                                    <li class="activity-item">
+                                        <div class="activity-dot"></div>
+                                        <div>
+                                            <small style="color:var(--gray);">{{ c.created_at }}</small><br>
+                                            {{ c.comment|truncatechars:40 }}
+                                        </div>
+                                    </li>
+                                    {% empty %}
+                                    <li class="text-muted small ps-2">No comments yet</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="list-group-item mb-2">
+                                    <i class="fas fa-flag me-2"></i> Latest Complaints
+                                    <span class="badge bg-success float-end">{{ recent.latest_complaints|length }}</span>
+                                </div>
+                                <ul class="list-unstyled recent-list ps-1">
+                                    {% for c in recent.latest_complaints %}
+                                    <li class="activity-item">
+                                        <div class="activity-dot"></div>
+                                        <div>
+                                            <small style="color:var(--gray);">{{ c.created_at }}</small><br>
+                                            {{ c.message|truncatechars:40 }}
+                                        </div>
+                                    </li>
+                                    {% empty %}
+                                    <li class="text-muted small ps-2">No complaints yet</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            <div class="col-md-4">
+                                <div class="list-group-item mb-2">
+                                    <i class="fas fa-star me-2"></i> Latest Feedback
+                                    <span class="badge bg-success float-end">{{ recent.latest_feedback|length }}</span>
+                                </div>
+                                <ul class="list-unstyled recent-list ps-1">
+                                    {% for f in recent.latest_feedback %}
+                                    <li class="activity-item">
+                                        <div class="activity-dot"></div>
+                                        <div>
+                                            <small style="color:var(--gray);">{{ f.created_at }}</small>
+                                            <span style="color:var(--primary);font-weight:700;"> {{ f.rating }}★</span><br>
+                                            {{ f.message|truncatechars:40 }}
+                                        </div>
+                                    </li>
+                                    {% empty %}
+                                    <li class="text-muted small ps-2">No feedback yet</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                        </div>
+                    </div>
+                    <!-- /Activity Summary -->
+
+                </div>
+            </div>
+            <!-- /Right Panel -->
+
+        </div>
+    </div>
+
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Footer -->
+    <footer class="text-center">
+        <div class="container">
+            <p class="mb-0">&copy; 2026 Live Sansad — AI Powered Digital Parliament Platform. Empowering Democracy Through Technology 🇮🇳</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+            function toggleSidebar() {
+                const isActive = sidebar.classList.toggle('active');
+                sidebarOverlay.style.display = isActive ? 'block' : 'none';
+            }
+
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            sidebarOverlay.addEventListener('click', toggleSidebar);
+
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.addEventListener('click', function () {
+                    if (window.innerWidth < 992) toggleSidebar();
+                });
+            });
+        });
+    </script>
+</body>
+</html>
