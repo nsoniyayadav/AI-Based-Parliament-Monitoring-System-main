@@ -1,0 +1,11 @@
+db.sqlite3
+.env
+media/
+videos/
+mp_face_detection/
+venv/
+__pycache__/
+*.pyc
+
+videos/
+*.mp4
